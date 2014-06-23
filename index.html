@@ -1,0 +1,99 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Chicken Dashboard</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" href="http://yui.yahooapis.com/combo?pure/0.5.0/base-min.css&pure/0.5.0/grids-min.css&pure/0.5.0/grids-responsive-old-ie-min.css">
+        <![endif]-->
+        <!--[if gt IE 8]><!-->
+            <link rel="stylesheet" href="http://yui.yahooapis.com/combo?pure/0.5.0/base-min.css&pure/0.5.0/grids-min.css&pure/0.5.0/grids-responsive-min.css">
+        <!--<![endif]-->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <style>
+
+        body {
+            background: #2c353a;
+        }
+        .chicken {
+            
+             text-align: center;
+        }
+
+        .chicken .pic {
+                        height: 100px;
+            width: 100px;
+            display: inline-block;
+            background-size: 125%;
+            background-position: 50%;
+            border-radius: 50%;
+            border: 1px solid #000;
+            padding: 10px;
+            text-align:center;
+            vertical-align: middle;
+        }
+
+        .title {
+            float: left;
+
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .content {
+            background: #f8f8f8;
+            display: inline-block;
+            padding: 1em;
+            margin: 1em;
+            min-height: 250px;
+        }
+
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div id="chickens" class="pure-g"></div>
+        </div>
+
+                <script>
+        $(document).ready(function(){
+                $.ajax({
+                    url: 'https://spreadsheets.google.com/feeds/list/0AqfNSkMs1MQndDBMZzZ6dUg2bERpS0draThjT0IzUWc/od7/public/values?alt=json',
+                    dataType: 'jsonp',
+                    success: function(data){
+                        console.log(data.feed.entry);
+
+                        $.each(data.feed.entry, function(node, index){
+                            var entry = data.feed.entry[node];
+                            console.log(data.feed.entry);
+                            var chicken = new Object();
+                            chicken.n = entry.gsx$chicken.$t;
+                            chicken.breed = entry.gsx$_d5fpr.$t;
+                            chicken.firstegg = entry.gsx$firstweekofeggs.$t;
+                            chicken.totaleggs = entry.gsx$totals.$t;
+                            chicken.pic = entry.gsx$pic.$t;
+
+                            var thisChicken = $("<div class='pure-u-1 pure-u-md-1-4'></div>");
+                            var content = $("<div class='content'></div>");
+                            thisChicken.attr('id', chicken.n.toLowerCase());
+                            thisChicken.addClass('chicken');
+                            console.log(chicken.pic);
+                            if (chicken.pic){
+                              content.append("<span class='pic' style='background-image:url("+chicken.pic+");'></span>");  
+                            }
+                            
+                            content.append("<div class='title'><h3>"+chicken.n+" - "+chicken.breed+"</h3><h4>"+chicken.totaleggs+"</h4></div>")
+                            thisChicken.append(content);
+                            $('#chickens').append(thisChicken);
+                        });
+                    }
+                });
+            })
+        </script>
+    </body>
+</html>
