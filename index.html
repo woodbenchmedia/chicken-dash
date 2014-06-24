@@ -24,7 +24,7 @@
         }
 
         .chicken .pic {
-                        height: 100px;
+            height: 100px;
             width: 100px;
             display: inline-block;
             background-size: 125%;
@@ -36,8 +36,12 @@
             vertical-align: middle;
         }
 
+        .no-pic .pic {
+            background-position: 50% 0;
+            background-size: 100%;
+        }
+
         .title {
-            float: left;
 
         }
         .container {
@@ -51,6 +55,14 @@
             padding: 1em;
             margin: 1em;
             min-height: 250px;
+            min-width: 175px;
+        }
+
+        .chicken-dead .pic{
+            -webkit-filter: grayscale(100%);
+            -moz-filter: grayscale(100%);
+            -ms-filter: grayscale(100%);
+            -o-filter: grayscale(100%);
         }
 
         </style>
@@ -70,26 +82,83 @@
 
                         $.each(data.feed.entry, function(node, index){
                             var entry = data.feed.entry[node];
-                            console.log(data.feed.entry);
+                            console.log(entry);
+
+                            //Set  Chicken Object
                             var chicken = new Object();
                             chicken.n = entry.gsx$chicken.$t;
                             chicken.breed = entry.gsx$_d5fpr.$t;
                             chicken.firstegg = entry.gsx$firstweekofeggs.$t;
                             chicken.totaleggs = entry.gsx$totals.$t;
                             chicken.pic = entry.gsx$pic.$t;
+                            chicken.perweek = Math.round(entry.gsx$eggsperweek.$t*100)/100;
+                            chicken.died = entry.gsx$died.$t;
 
-                            var thisChicken = $("<div class='pure-u-1 pure-u-md-1-4'></div>");
-                            var content = $("<div class='content'></div>");
-                            thisChicken.attr('id', chicken.n.toLowerCase());
-                            thisChicken.addClass('chicken');
-                            console.log(chicken.pic);
+                            if (chicken.died){
+                                chicken.died = true;
+                            }else {
+                                chicken.died = false;
+                            }
+
+                            //Create Elements
+                            var name = $("<h4></h4>"),
+                                total = $("<h4></h4>"),
+                                perweek = $("<h4></h4>"),
+                                picture = $("<span></span>"),
+                                layout = $("<div class='pure-u-1 pure-u-md-1-4'></div>"),
+                                content = $("<div class='content'></div>"),
+                                title = $("<div></div>");
+
+
+                            name.addClass('name');
+                            picture.addClass('pic');
+                            layout.attr('id', chicken.n.toLowerCase());
+                            layout.addClass('chicken');
+                            title.addClass('title');
+
+                            if(chicken.died){
+                                layout.addClass('chicken-dead');
+                            }
+
+                            
+                            
                             if (chicken.pic){
-                              content.append("<span class='pic' style='background-image:url("+chicken.pic+");'></span>");  
+                                picture.css("background-image","url("+chicken.pic+")"); 
+                            }else {
+                                layout.addClass('no-pic');
+                                picture.css('background-image','url(http://www.itskeptic.org/files/itskeptic/imagepicker/1/chicken_ITle_canstockphoto11513845.jpg)'); 
+                            }
+
+                            content.append(picture);
+
+                            name.append(chicken.n);
+
+                            if(chicken.breed){
+                                name.append(" - "+chicken.breed);
+                            }
+                            total.append(chicken.totaleggs);
+
+                            if(chicken.totaleggs !="no eggs yet"){
+                                total.append(" eggs");
+                            }
+
+                            if (chicken.perweek){
+                                perweek.append(chicken.perweek+" per week");
+                            }
+
+                            title.append(name);
+                            if(chicken.died){
+                                title.append("DEAD");
+                            }else{
+                               title.append(total);
+                               title.append(perweek);
                             }
                             
-                            content.append("<div class='title'><h3>"+chicken.n+" - "+chicken.breed+"</h3><h4>"+chicken.totaleggs+"</h4></div>")
-                            thisChicken.append(content);
-                            $('#chickens').append(thisChicken);
+
+                            content.append(title);
+
+                            layout.append(content);
+                            $('#chickens').append(layout);
                         });
                     }
                 });
